@@ -1,0 +1,27 @@
+using PlayerStatsApp.Models; //importing the player class so it can be used here
+
+namespace PlayerStatsApp.Controllers // creating a namespace for controllers to manage different aspects of the application
+{
+    public class PlayerController
+    {
+        private List<Player> players = new List<Player>(); // creating a private list to store players, uses encapsulation
+
+        // add a new player
+        public void AddPlayer(Player player) // adding a new player to the list, using void to perform an action without returning a value
+        {
+            players.Add(player);
+        }
+
+        // view all players
+        public List<Player> GetAllPlayers() // using a method to view and return the player objects, used to view all players
+        {
+            return players; // returns the private list so the ui can display players
+        }
+
+        // search player by ID
+        public Player? GetPlayerById(int id) // using Player? method to return only one player based on their unique ID, returns null if not found, the parameter represtns the id of the player to returns, use ? in Player? to return null if the id is invalid
+        {
+            return players.FirstOrDefault(p => p.Id == id); // using a c# sharp method to seach for player by id, returns null if not found
+        }
+    } // explation of the equation: p refers to a player in the list, the lambda expression checks if the player's id matches the provided id
+}
