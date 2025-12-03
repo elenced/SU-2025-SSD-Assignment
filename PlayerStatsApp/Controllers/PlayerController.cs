@@ -1,10 +1,19 @@
 using PlayerStatsApp.Models; //importing the player class so it can be used here
+using System.Collections.Generic; // importing the generic collections namespace to use lists
+
 
 namespace PlayerStatsApp.Controllers // creating a namespace for controllers to manage different aspects of the application
 {
     public class PlayerController
     {
         private List<Player> players = new List<Player>(); // creating a private list to store players, uses encapsulation
+
+        public void LoadPlayers(List<Player> loadedPlayers) // method to load players from external source, takes a list of players as parameter
+        {
+            players = loadedPlayers ?? new List<Player>(); // assigns the loaded players to the private list, if null assigns an empty list
+        }
+
+
 
         // add a new player
         public void AddPlayer(Player player) // adding a new player to the list, using void to perform an action without returning a value
