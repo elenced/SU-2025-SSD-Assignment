@@ -1,0 +1,15 @@
+[
+  {
+    "Id": 1,
+    "Username": "johndoe",
+    "HoursPlayed": 100,
+    "HighScore": 500,
+    "GameStatistics": [
+      {
+        "GameName": "Rivals of Ether",
+        "HighScore": 500,
+        "HoursPlayed": 100
+      }
+    ]
+  }
+]

@@ -3,6 +3,7 @@ using PlayerStatsApp.Controllers;
 using PlayerStatsApp.Models;
 using PlayerStatsApp.Services;
 using PlayerStatsApp.Services;
+using System.Linq;
 
 FileController fileController = new FileController("players.json"); // creating an instance of the FileController to handle file operations
 PlayerController playerManager = new PlayerController(); // manages player in memory
@@ -110,6 +111,9 @@ while (running)
             {
                 foreach (var player in players) // iterating through each player and displaying their details
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.WriteLine("────────────────────────────────────────────────────────────────────");
+                    Console.ResetColor();
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"ID: {player.Id} | Username: {player.Username}");
                     Console.ForegroundColor = ConsoleColor.Magenta;
@@ -123,7 +127,7 @@ while (running)
                         foreach (var stat in player.GameStatistics)
                         {
                             Console.ForegroundColor = ConsoleColor.DarkMagenta;
-                            Console.WriteLine($"     - {stat.GameName}: Hours Played - {stat.HoursPlayed}, High Score - {stat.HighScore}");
+                            Console.WriteLine($"     - {stat.GameName}: → Hours Played - {stat.HoursPlayed} | High Score - {stat.HighScore}");
                         }
                     }
                     else
@@ -134,6 +138,7 @@ while (running)
             }
             break;
         case "3":
+        {
             Console.Clear();
             Console.WriteLine("─── ⋅ Update Player Stats ⋅ ───");
             Console.Write("Enter Player ID to update: ");
@@ -147,6 +152,7 @@ while (running)
                 break;
             }
 
+
            
             Player? playerToUpdate = playerManager.GetPlayerById(updateId); // searching for the player by ID using the player manager, uses Player? as it may return null, displaying search algorithm on data
             if (playerToUpdate == null)
@@ -158,6 +164,62 @@ while (running)
             }
             
             Console.WriteLine($"Current stats for {playerToUpdate.Username}: Hours Played - {playerToUpdate.HoursPlayed}, High Score - {playerToUpdate.HighScore}");
+
+            if (playerToUpdate.GameStatistics == null)
+            {
+                playerToUpdate.GameStatistics = new List<GameStats>();
+            }
+
+            GameStats selectedGameStats;
+
+            if (playerToUpdate.GameStatistics.Count == 0)
+            {
+                Console.WriteLine("No game statistics available for this player.");
+                Console.WriteLine("Choose a game to add stats for:");
+                
+                for (int i = 0; i < GameStats.AvailableGames.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {GameStats.AvailableGames[i]}");
+                }
+
+                Console.Write("Select a game (1-" + GameStats.AvailableGames.Count + "):");
+                string gameChoiceInputUpdate = Console.ReadLine();
+
+                if (!int.TryParse(gameChoiceInputUpdate, out int gameChoiceUpdate) || gameChoiceUpdate < 1 || gameChoiceUpdate > GameStats.AvailableGames.Count)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Invalid game selection. Stats not updated, please try again.");
+                    Console.ResetColor();
+                    break;
+                }
+
+                string chosenGameName = GameStats.AvailableGames[gameChoiceUpdate - 1];
+
+                selectedGameStats = new GameStats(chosenGameName, 0 ,0);
+                playerToUpdate.GameStatistics.Add(selectedGameStats);
+            }
+            else
+            {
+                Console.WriteLine("Select a game to update stats for:");
+                for (int i = 0; i < playerToUpdate.GameStatistics.Count; i++)
+                {
+                    var gs = playerToUpdate.GameStatistics[i];
+                    Console.WriteLine($"{i + 1}. {gs.GameName} (Hours Played: {gs.HoursPlayed}, High Score: {gs.HighScore})");
+                }
+            }
+
+            Console.WriteLine("Enter selection: ");
+            string gameIndexInput = Console.ReadLine();
+            if (!int.TryParse(gameIndexInput, out int gameIndex) || gameIndex < 1 || gameIndex > playerToUpdate.GameStatistics.Count)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Invalid selection. Stats not updated, please try again.");
+                Console.ResetColor();
+                break;
+            }
+
+            selectedGameStats = playerToUpdate.GameStatistics[gameIndex - 1];
+
 
             Console.Write("Enter additional hours played: ");
             string updateHoursInput = Console.ReadLine();
@@ -181,19 +243,31 @@ while (running)
                 break;
             }
 
-            playerManager.UpdatePlayerStats(updateId, additionalHours, newHighScore); // updating player stats using the controller
-            fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after updating stats, ensuring data persistence
+            selectedGameStats.HoursPlayed += additionalHours;
+            if (newHighScore > selectedGameStats.HighScore)
+            {
+                selectedGameStats.HighScore = newHighScore;
+            }
+            else
+            {
+                Console.WriteLine("New high score is not greater than existing high score. High score not updated.");
+            }
+            
+           
 
-            playerToUpdate.UpdateStats(additionalHours, newHighScore); // calls player model to add/update the stats, using encapsulation as the ui doesnst change properties directly
+            playerToUpdate.HoursPlayed = playerToUpdate.GameStatistics.Sum(gs => gs.HoursPlayed); // updating total hours played based on game statistics, shows OOP data reltionships
+            playerToUpdate.HighScore = playerToUpdate.GameStatistics.Max(gs => gs.HighScore); // updating high score based on game statistics
+            fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after updating stats, ensuring data persistence
             Console.WriteLine("Player stats updated successfully!");
             break;
+        }
         case "4":
             Console.WriteLine("─── ⋅ Search for a Player by ID or Username ⋅ ───");
 
             Console.Write("Enter Player ID  or Username to search: ");
             string searchInput = Console.ReadLine();
             Player? foundPlayer;
-            if (!int.TryParse(searchInput, out int searchId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
+            if (int.TryParse(searchInput, out int searchId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
             {
                 foundPlayer = playerManager.GetPlayerById(searchId); //asking the controller to get the player by ID
             }

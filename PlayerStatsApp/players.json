@@ -1,106 +1,40 @@
 [
   {
     "Id": 1,
-    "Username": "testuser",
-    "HoursPlayed": 5,
-    "HighScore": 100,
-    "GameStatistics": []
+    "Username": "janedoe",
+    "HoursPlayed": 405,
+    "HighScore": 1100,
+    "GameStatistics": [
+      {
+        "GameName": "Mystic Lands",
+        "HighScore": 1100,
+        "HoursPlayed": 405
+      }
+    ]
   },
   {
     "Id": 2,
-    "Username": "idk",
-    "HoursPlayed": 228,
-    "HighScore": 400,
-    "GameStatistics": []
-  },
-  {
-    "Id": 3,
     "Username": "johndoe",
-    "HoursPlayed": 100,
+    "HoursPlayed": 302,
     "HighScore": 900,
     "GameStatistics": [
       {
-        "GameName": "Rivals of Ether",
+        "GameName": "Cyber Quest",
         "HighScore": 900,
-        "HoursPlayed": 100
+        "HoursPlayed": 302
       }
     ]
   },
   {
     "Id": 3,
-    "Username": "johndoe",
-    "HoursPlayed": 100,
-    "HighScore": 900,
-    "GameStatistics": [
-      {
-        "GameName": "Rivals of Ether",
-        "HighScore": 900,
-        "HoursPlayed": 100
-      }
-    ]
-  },
-  {
-    "Id": 5,
-    "Username": "testuser1",
-    "HoursPlayed": 100,
+    "Username": "jamesdoe",
+    "HoursPlayed": 5,
     "HighScore": 100,
     "GameStatistics": [
       {
         "GameName": "Crossing Paths",
         "HighScore": 100,
-        "HoursPlayed": 100
-      }
-    ]
-  },
-  {
-    "Id": 5,
-    "Username": "testuser1",
-    "HoursPlayed": 100,
-    "HighScore": 100,
-    "GameStatistics": [
-      {
-        "GameName": "Crossing Paths",
-        "HighScore": 100,
-        "HoursPlayed": 100
-      }
-    ]
-  },
-  {
-    "Id": 6,
-    "Username": "testuser3",
-    "HoursPlayed": 4,
-    "HighScore": 4,
-    "GameStatistics": [
-      {
-        "GameName": "Mystic Lands",
-        "HighScore": 4,
-        "HoursPlayed": 4
-      }
-    ]
-  },
-  {
-    "Id": 6,
-    "Username": "testuser3",
-    "HoursPlayed": 4,
-    "HighScore": 4,
-    "GameStatistics": [
-      {
-        "GameName": "Mystic Lands",
-        "HighScore": 4,
-        "HoursPlayed": 4
-      }
-    ]
-  },
-  {
-    "Id": 9,
-    "Username": "janedoe",
-    "HoursPlayed": 10,
-    "HighScore": 100,
-    "GameStatistics": [
-      {
-        "GameName": "Gate 3",
-        "HighScore": 100,
-        "HoursPlayed": 10
+        "HoursPlayed": 5
       }
     ]
   }
