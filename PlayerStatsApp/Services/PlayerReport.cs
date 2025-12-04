@@ -28,7 +28,7 @@ namespace PlayerStatsApp.Services
             Player? topScorer = null;
             Player? mostActive = null;
 
-            for each (Player p in players)
+            foreach (Player p in players)
             {
                 totalHours += p.HoursPlayed;
                 totalHighScore += p.HighScore;
