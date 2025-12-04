@@ -47,7 +47,7 @@ namespace PlayerStatsApp.Services
             double averageHighScore = (double)totalHighScore / players.Count;
 
             string summary = "─── ⋅ Player Statistics Summary ⋅ ───\n" +
-                             $"Generated on: + {DateTime.Now:F}\n" +
+                             $"Generated on: {DateTime.Now:F}\n" +
                              $"Total Players: {players.Count}\n" +
                              $"Average Hours Played: {averageHours:F2}\n" +
                              $"Average High Score: {averageHighScore:F2}\n" +

@@ -2,9 +2,18 @@
 using PlayerStatsApp.Controllers;
 using PlayerStatsApp.Models;
 using PlayerStatsApp.Services;
+using PlayerStatsApp.Services;
 
 FileController fileController = new FileController("players.json"); // creating an instance of the FileController to handle file operations
 PlayerController playerManager = new PlayerController(); // manages player in memory
+PlayerReport reportGenerator = new PlayerReport(); // creating an instance of the PlayerReport to handle report generation
+List<string> GameList = new List<string>
+{
+    "Rivals of Ether",
+    "Cyber Quest",
+    "Gate 3",
+    "Crossing Paths"
+};
 
 var existingPlayers = fileController.LoadPlayers(); // loading existing players from the file using the file controller
 playerManager.LoadPlayers(existingPlayers); // loading the existing players into the player manager
@@ -22,7 +31,7 @@ while (running)
     Console.WriteLine("1. Add New Player");
     Console.WriteLine("2. View Players");
     Console.WriteLine("3. Update Player Stats");
-    Console.WriteLine("4. Search Player by ID");
+    Console.WriteLine("4. Search Player by ID or Username");
     Console.WriteLine("5. Generate Report");
     Console.WriteLine("6. Leave Application");
     Console.Write("Select an option (1-6): ");
@@ -64,6 +73,9 @@ while (running)
 
             playerManager.AddPlayer(newPlayer); // adding the new player to the player manager, using controller layer to handle the addition
 
+            fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after adding a new player, ensuring data persistence
+
+            playerManager.AddPlayer(newPlayer); 
             fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after adding a new player, ensuring data persistence
 
             nextPlayerID++; // incrementing the player ID for the next new player
@@ -145,21 +157,21 @@ while (running)
             Console.WriteLine("Player stats updated successfully!");
             break;
         case "4":
-            Console.WriteLine("─── ⋅ Search for a Player by ID ⋅ ───");
+            Console.WriteLine("─── ⋅ Search for a Player by ID or Username ⋅ ───");
 
-            Console.Write("Enter Player ID to search: ");
-            string iDInput = Console.ReadLine();
-            if (!int.TryParse(iDInput, out int searchId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
+            Console.Write("Enter Player ID  or Username to search: ");
+            string searchInput = Console.ReadLine();
+            Player? foundPlayer;
+            if (!int.TryParse(searchInput, out int searchId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Error, please enter a numerical value. Returning to menu.");
-                Console.ResetColor();
-                break;
+                foundPlayer = playerManager.GetPlayerById(searchId); //asking the controller to get the player by ID
+            }
+            else
+            {
+             foundPlayer = playerManager.GetPlayerByUsername(searchInput); // asking the controller to get the player by username
             }
             
-            var foundPlayer = playerManager.GetPlayerById(searchId); //asking the controller to get the player by ID
-
-            
+        
             if (foundPlayer != null)
             {
                 Console.WriteLine("Player found:");
@@ -171,15 +183,17 @@ while (running)
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid ID! Please re-try.");
+                Console.WriteLine("Invalid ID or Username! Please re-try.");
                 Console.ResetColor();
             }
 
             break;
         case "5":
+            Console.Clear();
+            Console.WriteLine("─── ⋅ Generate Player Report ⋅ ───");
+            var allPlayerForReport = playerManager.GetAllPlayers(); // retrieving all players from the player manager for report generation
+            reportGenerator.GenerateSummary(allPlayerForReport); // generating the player report using the PlayerReport service
 
-
-            Console.WriteLine("Generating report...");
             break;
         case "6":
             // Exit the application

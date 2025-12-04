@@ -27,6 +27,12 @@ namespace PlayerStatsApp.Controllers // creating a namespace for controllers to 
             return players; // returns the private list so the ui can display players
         }
 
+        public Player? GetPlayerByUsername(string username)
+        {
+            return players.FirstOrDefault(p => p.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+        }
+
+
         public void UpdatePlayerStats(int id, double additonalHours, int newHighScore) // method to update player stats, takes player id, additional hours and new high score as parameters, using encapsulation to manage player data
         {
             var player = GetPlayerById(id); // calling the GetPlayerById method to find the player by their unique ID
