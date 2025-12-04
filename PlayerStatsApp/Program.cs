@@ -104,6 +104,7 @@ while (running)
                 break;
             }
 
+           
             Player? playerToUpdate = playerManager.GetPlayerById(updateId); // searching for the player by ID using the player manager, uses Player? as it may return null, displaying search algorithm on data
             if (playerToUpdate == null)
             {
@@ -121,7 +122,7 @@ while (running)
             if (!double.TryParse(updateHoursInput, out double additionalHours))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid hours input. Stats not updated.");
+                Console.WriteLine("Invalid hours input. Stats not updated, please try again.");
                 Console.ResetColor();
                 break;
             }
@@ -132,10 +133,13 @@ while (running)
             if (!int.TryParse(updateScoreInput, out int newHighScore)) // using the out keyword to store the parsed integer value directly into newHighScore variable, using ! to check for invalid input, shows error is so
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid score input. Stats not updated.");
+                Console.WriteLine("Invalid score input. Stats not updated, please try again");
                 Console.ResetColor();
                 break;
             }
+
+            playerManager.UpdatePlayerStats(updateId, additionalHours, newHighScore); // updating player stats using the controller
+            fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after updating stats, ensuring data persistence
 
             playerToUpdate.UpdateStats(additionalHours, newHighScore); // calls player model to add/update the stats, using encapsulation as the ui doesnst change properties directly
             Console.WriteLine("Player stats updated successfully!");
@@ -144,9 +148,18 @@ while (running)
             Console.WriteLine("─── ⋅ Search for a Player by ID ⋅ ───");
 
             Console.Write("Enter Player ID to search: ");
-            int searchId = Convert.ToInt32(Console.ReadLine()); // reading and converting the player ID input to int
+            string iDInput = Console.ReadLine();
+            if (!int.TryParse(iDInput, out int searchId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Error, please enter a numerical value. Returning to menu.");
+                Console.ResetColor();
+                break;
+            }
+            
+            var foundPlayer = playerManager.GetPlayerById(searchId); //asking the controller to get the player by ID
 
-            var foundPlayer = playerManager.GetPlayerById(searchId); // searching for the player by ID using the player manager
+            
             if (foundPlayer != null)
             {
                 Console.WriteLine("Player found:");
@@ -158,7 +171,7 @@ while (running)
             else
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Player not found! Please re-try.");
+                Console.WriteLine("Invalid ID! Please re-try.");
                 Console.ResetColor();
             }
 

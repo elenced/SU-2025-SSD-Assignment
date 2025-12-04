@@ -4,5 +4,11 @@
     "Username": "testuser",
     "HoursPlayed": 5,
     "HighScore": 100
+  },
+  {
+    "Id": 2,
+    "Username": "idk",
+    "HoursPlayed": 120,
+    "HighScore": 200
   }
 ]
