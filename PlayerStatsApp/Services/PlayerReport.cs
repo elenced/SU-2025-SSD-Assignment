@@ -60,7 +60,7 @@ namespace PlayerStatsApp.Services
                 File.WriteAllText(reportPath, summary);
                 logger.Log("Player report saved to "  + reportPath);
             }
-            catch (IOException ex)
+            catch (Exception ex)
             {
                 logger.Log($"Error writing report, check here: {ex.Message}");
             }

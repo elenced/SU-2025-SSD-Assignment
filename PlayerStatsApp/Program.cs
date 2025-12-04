@@ -39,10 +39,26 @@ while (running)
             string username = Console.ReadLine(); // reading the username input from the user
 
             Console.Write("Enter hours played: ");
-            double hoursPlayed = Convert.ToDouble(Console.ReadLine()); // reading and converting hours played input to double
+            string hoursInput = Console.ReadLine();
+
+            if (!double.TryParse(hoursInput, out double hoursPlayed))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Invalid hours input. Player not added.");
+                Console.ResetColor();
+                break;
+            }
 
             Console.Write("Enter high score: ");
-            int highScore = Convert.ToInt32(Console.ReadLine()); // reading and converting high score input to int
+            string scoreInput = Console.ReadLine();
+
+            if (!int.TryParse(scoreInput, out int highScore))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("Invalid score input. Player not added.");
+                Console.ResetColor();
+                break;
+            }
 
             Player newPlayer = new Player(nextPlayerID, username, hoursPlayed, highScore); // creating a new player object with the provided details, using model layer to represent the player
 
@@ -100,9 +116,9 @@ while (running)
             Console.WriteLine($"Current stats for {playerToUpdate.Username}: Hours Played - {playerToUpdate.HoursPlayed}, High Score - {playerToUpdate.HighScore}");
 
             Console.Write("Enter additional hours played: ");
-            string hoursInput = Console.ReadLine();
+            string updateHoursInput = Console.ReadLine();
 
-            if (!double.TryParse(hoursInput, out double additionalHours))
+            if (!double.TryParse(updateHoursInput, out double additionalHours))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Invalid hours input. Stats not updated.");
@@ -111,9 +127,9 @@ while (running)
             }
 
             Console.Write("Enter new high score: ");
-            string scoreInput = Console.ReadLine();
+            string updateScoreInput = Console.ReadLine();
 
-            if (!int.TryParse(scoreInput, out int newHighScore)) // using the out keyword to store the parsed integer value directly into newHighScore variable, using ! to check for invalid input, shows error is so
+            if (!int.TryParse(updateScoreInput, out int newHighScore)) // using the out keyword to store the parsed integer value directly into newHighScore variable, using ! to check for invalid input, shows error is so
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Invalid score input. Stats not updated.");
