@@ -2,12 +2,14 @@
 using PlayerStatsApp.Controllers;
 using PlayerStatsApp.Models;
 using PlayerStatsApp.Services;
-using PlayerStatsApp.Services;
 using System.Linq;
+using System.Security;
+ActivityLog logger = ActivityLog.GetInstance(); // initializing the singleton logger instance to log application activities
 
 FileController fileController = new FileController("players.json"); // creating an instance of the FileController to handle file operations
 PlayerController playerManager = new PlayerController(); // manages player in memory
 PlayerReport reportGenerator = new PlayerReport(); // creating an instance of the PlayerReport to handle report generation
+
 
 var existingPlayers = fileController.LoadPlayers(); // loading existing players from the file using the file controller
 playerManager.LoadPlayers(existingPlayers); // loading the existing players into the player manager
@@ -20,7 +22,7 @@ bool running = true; // creating a boolean to control the menu loop
 while (running)
 {
     Console.ForegroundColor = ConsoleColor.Magenta; // setting the console text color to cyan for aethetics
-
+    logger.Log("Console app loaded.");
     Console.WriteLine("─── ⋅ Player Statistics Manager ⋅ ───");
     Console.WriteLine("1. Add New Player");
     Console.WriteLine("2. View Players");
@@ -94,6 +96,7 @@ while (running)
     
             nextPlayerID++; // incrementing the player ID for the next new player
             Console.WriteLine("[■■■■■■■■■] 100%! Player added successfully!");
+            logger.Log($"New player added: {username} (ID: {nextPlayerID - 1}).");
             break;
 
 
@@ -137,130 +140,184 @@ while (running)
                 }
             }
             break;
-        case "3":
+  case "3":
+{
+    Console.Clear();
+    Console.WriteLine("─── ⋅ Update Player Stats ⋅ ───");
+    Console.Write("Enter Player ID to update: ");
+    string updateIdInput = Console.ReadLine();
+
+    if (!int.TryParse(updateIdInput, out int updateId))
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid ID. Returning to menu.");
+        Console.ResetColor();
+        break;
+    }
+
+    Player? playerToUpdate = playerManager.GetPlayerById(updateId);
+    if (playerToUpdate == null)
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Player not found! Please re-try.");
+        Console.ResetColor();
+        break;
+    }
+
+    Console.WriteLine(
+        $"Current stats for {playerToUpdate.Username}: " +
+        $"Hours Played - {playerToUpdate.HoursPlayed}, High Score - {playerToUpdate.HighScore}");
+
+    if (playerToUpdate.GameStatistics == null)
+    {
+        playerToUpdate.GameStatistics = new List<GameStats>();
+    }
+
+
+    GameStats selectedGameStats;
+
+    Console.WriteLine("Update either existing game stats or add new game stats.");
+    Console.WriteLine("1. Update Existing Game Stats");
+    Console.WriteLine("2. Add New Game Stats");
+    Console.Write("Select an option (1-2): ");
+    string updateOption = Console.ReadLine();
+
+ if (updateOption == "2")
+{
+
+    while (true)
+    {
+        Console.WriteLine("Choose a game to add stats for:");
+        for (int i = 0; i < GameStats.AvailableGames.Count; i++)
         {
-            Console.Clear();
-            Console.WriteLine("─── ⋅ Update Player Stats ⋅ ───");
-            Console.Write("Enter Player ID to update: ");
-            string updateIdInput = Console.ReadLine();
+            Console.WriteLine($"{i + 1}. {GameStats.AvailableGames[i]}");
+        }
 
-            if (!int.TryParse(updateIdInput, out int updateId)) // using inttryparse to convert string into integer and handle invalid input effectively, prevents crashing + allows for easy testing
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid ID. Returning to menu.");
-                Console.ResetColor();
-                break;
-            }
+        Console.Write($"Select a game (1-{GameStats.AvailableGames.Count}, or 0 to cancel): ");
+        string newGameChoice = Console.ReadLine();
 
+        
+        if (newGameChoice == "0")
+        {
+            Console.WriteLine("Cancelled adding new game stats. Returning to main menu.");
+            return; // or 'break;' if you want to just exit case "3"
+        }
 
-           
-            Player? playerToUpdate = playerManager.GetPlayerById(updateId); // searching for the player by ID using the player manager, uses Player? as it may return null, displaying search algorithm on data
-            if (playerToUpdate == null)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Player not found! Please re-try.");
-                Console.ResetColor();
-                break;
-            }
-            
-            Console.WriteLine($"Current stats for {playerToUpdate.Username}: Hours Played - {playerToUpdate.HoursPlayed}, High Score - {playerToUpdate.HighScore}");
+        if (!int.TryParse(newGameChoice, out int newGameIndex) ||
+            newGameIndex < 1 || newGameIndex > GameStats.AvailableGames.Count)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Invalid game selection. Please try again.");
+            Console.ResetColor();
+            continue; // repeat the loop
+        }
 
-            if (playerToUpdate.GameStatistics == null)
-            {
-                playerToUpdate.GameStatistics = new List<GameStats>();
-            }
+        string newGameName = GameStats.AvailableGames[newGameIndex - 1];
 
-            GameStats selectedGameStats;
+       
+        var existingGame = playerToUpdate.GameStatistics
+            .FirstOrDefault(gs => gs.GameName.Equals(newGameName, StringComparison.OrdinalIgnoreCase));
 
-            if (playerToUpdate.GameStatistics.Count == 0)
-            {
-                Console.WriteLine("No game statistics available for this player.");
-                Console.WriteLine("Choose a game to add stats for:");
-                
-                for (int i = 0; i < GameStats.AvailableGames.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. {GameStats.AvailableGames[i]}");
-                }
+        if (existingGame != null)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("This player already has stats for that game.");
+            Console.WriteLine("Please choose a different game.");
+            Console.ResetColor();
+            continue; // repeat the loop and show the list again
+        }
 
-                Console.Write("Select a game (1-" + GameStats.AvailableGames.Count + "):");
-                string gameChoiceInputUpdate = Console.ReadLine();
-
-                if (!int.TryParse(gameChoiceInputUpdate, out int gameChoiceUpdate) || gameChoiceUpdate < 1 || gameChoiceUpdate > GameStats.AvailableGames.Count)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine("Invalid game selection. Stats not updated, please try again.");
-                    Console.ResetColor();
-                    break;
-                }
-
-                string chosenGameName = GameStats.AvailableGames[gameChoiceUpdate - 1];
-
-                selectedGameStats = new GameStats(chosenGameName, 0 ,0);
-                playerToUpdate.GameStatistics.Add(selectedGameStats);
-            }
-            else
-            {
-                Console.WriteLine("Select a game to update stats for:");
-                for (int i = 0; i < playerToUpdate.GameStatistics.Count; i++)
-                {
-                    var gs = playerToUpdate.GameStatistics[i];
-                    Console.WriteLine($"{i + 1}. {gs.GameName} (Hours Played: {gs.HoursPlayed}, High Score: {gs.HighScore})");
-                }
-            }
-
-            Console.WriteLine("Enter selection: ");
-            string gameIndexInput = Console.ReadLine();
-            if (!int.TryParse(gameIndexInput, out int gameIndex) || gameIndex < 1 || gameIndex > playerToUpdate.GameStatistics.Count)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid selection. Stats not updated, please try again.");
-                Console.ResetColor();
-                break;
-            }
-
-            selectedGameStats = playerToUpdate.GameStatistics[gameIndex - 1];
-
-
-            Console.Write("Enter additional hours played: ");
-            string updateHoursInput = Console.ReadLine();
-
-            if (!double.TryParse(updateHoursInput, out double additionalHours))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid hours input. Stats not updated, please try again.");
-                Console.ResetColor();
-                break;
-            }
-
-            Console.Write("Enter new high score: ");
-            string updateScoreInput = Console.ReadLine();
-
-            if (!int.TryParse(updateScoreInput, out int newHighScore)) // using the out keyword to store the parsed integer value directly into newHighScore variable, using ! to check for invalid input, shows error is so
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Invalid score input. Stats not updated, please try again");
-                Console.ResetColor();
-                break;
-            }
-
-            selectedGameStats.HoursPlayed += additionalHours;
-            if (newHighScore > selectedGameStats.HighScore)
-            {
-                selectedGameStats.HighScore = newHighScore;
-            }
-            else
-            {
-                Console.WriteLine("New high score is not greater than existing high score. High score not updated.");
-            }
-            
-           
-
-            playerToUpdate.HoursPlayed = playerToUpdate.GameStatistics.Sum(gs => gs.HoursPlayed); // updating total hours played based on game statistics, shows OOP data reltionships
-            playerToUpdate.HighScore = playerToUpdate.GameStatistics.Max(gs => gs.HighScore); // updating high score based on game statistics
-            fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file after updating stats, ensuring data persistence
-            Console.WriteLine("Player stats updated successfully!");
+        
+        selectedGameStats = new GameStats(newGameName, 0, 0);
+        playerToUpdate.GameStatistics.Add(selectedGameStats);
+        break; // exit the while loop and continue with asking for hours / score
+    }
+}
+    
+    else if (updateOption == "1")
+    {
+        if (playerToUpdate.GameStatistics.Count == 0)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Player has no game stats yet. Add a new game first.");
+            Console.ResetColor();
             break;
         }
+
+        Console.WriteLine("Select a game to update stats for:");
+        for (int i = 0; i < playerToUpdate.GameStatistics.Count; i++)
+        {
+            var gs = playerToUpdate.GameStatistics[i];
+            Console.WriteLine($"{i + 1}. {gs.GameName} " +
+                              $"(Hours Played: {gs.HoursPlayed}, High Score: {gs.HighScore})");
+        }
+
+        Console.Write("Enter selection: ");
+        string gameIndexInput = Console.ReadLine();
+
+        if (!int.TryParse(gameIndexInput, out int gameIndex) ||
+            gameIndex < 1 || gameIndex > playerToUpdate.GameStatistics.Count)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Invalid selection. Stats not updated, please try again.");
+            Console.ResetColor();
+            break;
+        }
+
+        selectedGameStats = playerToUpdate.GameStatistics[gameIndex - 1];
+    }
+    
+    else
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid option. Stats not updated, please try again.");
+        Console.ResetColor();
+        break;
+    }
+
+    
+    Console.Write("Enter additional hours played: ");
+    string updateHoursInput = Console.ReadLine();
+
+    if (!double.TryParse(updateHoursInput, out double additionalHours))
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid hours input. Stats not updated, please try again.");
+        Console.ResetColor();
+        break;
+    }
+
+    Console.Write("Enter new high score: ");
+    string updateScoreInput = Console.ReadLine();
+
+    if (!int.TryParse(updateScoreInput, out int newHighScore))
+    {
+        Console.ForegroundColor = ConsoleColor.Red;
+        Console.WriteLine("Invalid score input. Stats not updated, please try again");
+        Console.ResetColor();
+        break;
+    }
+
+    selectedGameStats.HoursPlayed += additionalHours;
+
+    if (newHighScore > selectedGameStats.HighScore)
+    {
+        selectedGameStats.HighScore = newHighScore;
+    }
+    else
+    {
+        Console.WriteLine("New high score is not greater than existing high score. High score not updated.");
+    }
+
+    // recompute overall totals from per-game stats
+    playerToUpdate.HoursPlayed = playerToUpdate.GameStatistics.Sum(gs => gs.HoursPlayed);
+    playerToUpdate.HighScore = playerToUpdate.GameStatistics.Max(gs => gs.HighScore);
+
+    fileController.SavePlayers(playerManager.GetAllPlayers());
+    Console.WriteLine("Player stats updated successfully!");
+    logger.Log($"Stats updated for player ID {playerToUpdate.Id}, game: {selectedGameStats.GameName}.");
+    break;
+}
         case "4":
             Console.WriteLine("─── ⋅ Search for a Player by ID or Username ⋅ ───");
 
@@ -280,6 +337,7 @@ while (running)
             if (foundPlayer != null)
             {
                 Console.WriteLine("Player found:");
+                logger.Log($"Search successful for player: {foundPlayer.Username} (ID: {foundPlayer.Id}).");
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine($"ID: {foundPlayer.Id} | Username: {foundPlayer.Username}");
                 Console.ForegroundColor = ConsoleColor.Magenta;
@@ -289,6 +347,7 @@ while (running)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Invalid ID or Username! Please re-try.");
+                logger.Log($"Search failed. No player found for input: '{searchInput}'.");
                 Console.ResetColor();
             }
 
@@ -297,7 +356,18 @@ while (running)
             Console.Clear();
             Console.WriteLine("─── ⋅ Generate Player Report ⋅ ───");
             var allPlayerForReport = playerManager.GetAllPlayers(); // retrieving all players from the player manager for report generation
-            reportGenerator.GenerateSummary(allPlayerForReport); // generating the player report using the PlayerReport service
+
+            if (allPlayerForReport.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("No players available to generate report, please add players first.");
+                Console.ResetColor();
+            }
+            
+            {
+                reportGenerator.GenerateSummary(allPlayerForReport);  // generating the player report using the PlayerReport service
+                logger.Log("Player report generated successfully.");
+            }
 
             break;
         case "6":

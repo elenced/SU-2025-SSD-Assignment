@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using PlayerStatsApp.Models;
 
 namespace PlayerStatsApp.Services
@@ -46,13 +47,25 @@ namespace PlayerStatsApp.Services
             double averageHours = totalHours / players.Count;
             double averageHighScore = (double)totalHighScore / players.Count;
 
-            string summary = "─── ⋅ Player Statistics Summary ⋅ ───\n" +
-                             $"Generated on: {DateTime.Now:F}\n" +
-                             $"Total Players: {players.Count}\n" +
-                             $"Average Hours Played: {averageHours:F2}\n" +
-                             $"Average High Score: {averageHighScore:F2}\n" +
-                             $"Top Scorer: {topScorer?.Username} with a score of {topScorer?.HighScore}\n" +
-                             $"Most Active Player: {mostActive?.Username} with {mostActive?.HoursPlayed} hours played\n";
+            var playersByHours = players
+                .OrderByDescending(p => p.HoursPlayed)
+                .ToList();
+
+string summary = "─── ⋅ Player Statistics Summary ⋅ ───\n" +
+                 $"Generated on: {DateTime.Now:F}\n" +
+                 $"Total Players: {players.Count}\n" +
+                 $"Average Hours Played: {averageHours:F2}\n" +
+                 $"Average High Score: {averageHighScore:F2}\n" +
+                 $"Top Scorer: {topScorer?.Username} with a score of {topScorer?.HighScore}\n" +
+                 $"Most Active Player: {mostActive?.Username} with {mostActive?.HoursPlayed} hours played\n" +
+                 "────────────────────────────────────\n" +
+                 "Players by Hours Played:\n";
+
+            foreach (var p in playersByHours)
+            {
+                summary +=  $"- {p.Username} | Hours: {p.HoursPlayed:F1} | High Score: {p.HighScore}\n";
+            }
+
 
             Console.WriteLine(summary);
             try

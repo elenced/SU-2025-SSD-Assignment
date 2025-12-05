@@ -2,39 +2,49 @@
   {
     "Id": 1,
     "Username": "janedoe",
-    "HoursPlayed": 405,
-    "HighScore": 1100,
+    "HoursPlayed": 408,
+    "HighScore": 1200,
     "GameStatistics": [
       {
         "GameName": "Mystic Lands",
-        "HighScore": 1100,
-        "HoursPlayed": 405
+        "HighScore": 1200,
+        "HoursPlayed": 408
       }
     ]
   },
   {
     "Id": 2,
     "Username": "johndoe",
-    "HoursPlayed": 302,
-    "HighScore": 900,
+    "HoursPlayed": 304,
+    "HighScore": 905,
     "GameStatistics": [
       {
         "GameName": "Cyber Quest",
-        "HighScore": 900,
-        "HoursPlayed": 302
+        "HighScore": 905,
+        "HoursPlayed": 304
       }
     ]
   },
   {
     "Id": 3,
     "Username": "jamesdoe",
-    "HoursPlayed": 5,
-    "HighScore": 100,
+    "HoursPlayed": 75,
+    "HighScore": 300,
     "GameStatistics": [
       {
         "GameName": "Crossing Paths",
-        "HighScore": 100,
-        "HoursPlayed": 5
+        "HighScore": 200,
+        "HoursPlayed": 7
+      },
+      {
+        "GameName": "Mystic Lands",
+        "HighScore": 200,
+        "HoursPlayed": 58
+      },
+      {
+        "GameName": "Rivals of Ether",
+        "HighScore": 300,
+        "HoursPlayed": 10
       }
     ]
   }
