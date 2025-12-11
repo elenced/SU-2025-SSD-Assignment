@@ -14,16 +14,20 @@ these stats over time. Players should be searchable by ID or username, and repor
 be generated to display the most active players or top scores. Data must be saved and
 loaded using files so that progress is not lost, and important actions should be logged."
 
-Using C# I will make an interactive program for the users of the manager. I will focus on adding these five features listed below:
+Using C# I will make an interactive program for the users of the manager. I will focus on adding these six features listed below:
 1) Adding, updating and searching for players
 
-2) Tracking hours played and high scores of invidiual players
+2) Update player gameplay statistics such as hours played and high scores
 
-3) Have the ability to view weekly/daily/monthly reports for top players and most active users
+3) Be able to add new games and have unique statistics for them
 
-4) Save data between sessions using JSON files
+4) Generate reports such as most active players or highest scorers
 
-5) Log important actions to a text file
+5) Save and load player data using JSON
+
+6) Log important actions to a text file
+
+This application is written in C# and follows object-oriented principles throughout its design and implementation.
 
 
 ──────‧₊˚ Project Purpose ‧₊──────
@@ -50,6 +54,7 @@ Go to the repository page -  https://github.com/elenced/SU-2025-SSD-Assigment
 2) Choose Download ZIP
 3) Extract the ZIP file to your computer
 4) Open the solution file (.sln) in Visual Studio
+5) Run the project using F5 or dotnet run in VS Code's terminal
 
 Option 2:
 If you have already have Git installed on your computer open your terminal in Visual Studio and run the following:
@@ -61,7 +66,7 @@ After deciding one or the other option you will end up running the solution with
 1. Add New Player
 2. View Players
 3. Update Player Stats
-4. Search Player by ID
+4. Search Player by ID or Username
 5. Generate Report
 6. Exit
 
@@ -74,15 +79,17 @@ I decided to base my system off the foundations of OOP as it allows for flexibil
 
 Player – Represents an individual player with attributes such as username, hours played and their high score. This shows that I can use encapsulation through private fields and public getters/setters.
 
-PlayerController – Handles adding, updating and searching for players. It controls the  logic between the user interface and data handling
+PlayerController – Handles adding, updating and searching for players. It controls the  logic between the user interface and data handling. Serves as the main logic layer between UI and data storage.
 
-FileController and FileControllerInterface – Responsible for saving and loading player data. This uses the concept of polymorphism through the interface which will allow for flexibility for different file types in future.
+FileController and IReportGenerator – Responsible for saving and loading player data. This uses the concept of polymorphism through the interface which will allow for flexibility for different file types in future. IReportGenerator demonstrates abstraction, allowing report functionality to be extended easily.
 
 ActivityLog – Uses the Singleton pattern so only one log file is created which ensures efficient and consistent logging of the users actions.
 
 StatisticsManager and ReportGenerator – Manages calculations for reports such as most active player and top scorer.
 
 GameLibrary and GameClass – Represents the list of games and their details. This will use composition to show how multiple games are linked together.
+
+PlayerReport - Generates player summaries such as top players as well as most active players. This demonstrates seperation of concerns, keeping reporting logic seperate from the core system.
 
 Misc - For data persistence, the program uses JSON because it is built into C# which is easy to read, humans can read it meaning the indie developers can understand the data they are collecting. It allows players’ data to be saved and reloaded automatically. The search and sort functions demonstrate basic algorithm design — players can be found by ID or username and sorted by hours played or high scores.
 Finally, all significant actions (adding, updating, deleting players, etc) are logged to a text file (activity_log.txt) for potential and error fixing.
