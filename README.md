@@ -1,4 +1,4 @@
-# SU-2025-SSD-Assigment
+# SU-2025-SSD-Assignment
 
 ──────‧₊˚ Introduction  ‧₊──────
 
@@ -49,7 +49,7 @@ Before doing anything you will need to make sure you have the right system requi
 
 After making sure you have the system requirements to run the program you have two options!
 Option 1:
-Go to the repository page -  https://github.com/elenced/SU-2025-SSD-Assigment
+Go to the repository page -  https://github.com/elenced/SU-2025-SSD-Assignment
 1) Click the green Code button
 2) Choose Download ZIP
 3) Extract the ZIP file to your computer
@@ -58,7 +58,7 @@ Go to the repository page -  https://github.com/elenced/SU-2025-SSD-Assigment
 
 Option 2:
 If you have already have Git installed on your computer open your terminal in Visual Studio and run the following:
-git clone https://github.com/elenced/SU-2025-SSD-Assigment.git
+git clone https://github.com/elenced/SU-2025-SSD-Assignment.git
 
 After deciding one or the other option you will end up running the solution within Visual Studio code, if all was downloaded correctly you should be greeted by a UI. Similar to this as shown below:
 
