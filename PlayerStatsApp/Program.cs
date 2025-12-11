@@ -1,18 +1,36 @@
-﻿using System;
+﻿// ================================================================
+// PROGRAM.CS - Main Console Application
+// Author: Eve Downs (bi76tr)
+// Module: CET2007 - Software Design & Development
+//
+// Responsibilities:
+// - Displays the main menu
+// - Handles user input and menu navigation
+// - Uses PlayerController for all player logic
+// - Uses FileController for JSON persistence
+// - Logs actions using ActivityLog (Singleton)
+// ================================================================
+
+
+using System;
 using PlayerStatsApp.Controllers;
 using PlayerStatsApp.Models;
 using PlayerStatsApp.Services;
 using System.Linq;
 using System.Security;
 
-
+// ---------------------------------------------------------------
+// INITIALISE CORE SYSTEM COMPONENTS
+// ---------------------------------------------------------------
 
 ActivityLog logger = ActivityLog.GetInstance(); // initializing the singleton logger instance to log application activities
-
 FileController fileController = new FileController("players.json"); // creating an instance of the FileController to handle file operations
 PlayerController playerManager = new PlayerController(); // manages player in memory
 IReportGenerator reportGenerator = new PlayerReport(); // creating an instance of the PlayerReport to handle report generation
 
+// ---------------------------------------------------------------
+// LOAD EXISTING DATA (if any) FROM JSON
+// ---------------------------------------------------------------
 
 var existingPlayers = fileController.LoadPlayers(); // loading existing players from the file using the file controller
 playerManager.LoadPlayers(existingPlayers); // loading the existing players into the player manager
@@ -21,48 +39,45 @@ playerManager.LoadPlayers(existingPlayers); // loading the existing players into
 int nextPlayerID = existingPlayers.Count + 1; // initializing a variable to assign unique IDs to new players, so each player can be identified distinctly
 bool running = true; // creating a boolean to control the menu loop
 
+// ---------------------------------------------------------------
+// MAIN APPLICATION LOOP
+// ---------------------------------------------------------------
+
 
 while (running)
 {
-    Console.ForegroundColor = ConsoleColor.Magenta; // setting the console text color to cyan for aethetics
-    logger.Log("Console app loaded.");
-    Console.WriteLine("─── ⋅ Player Statistics Manager ⋅ ───");
-    Console.WriteLine("1. Add New Player");
-    Console.WriteLine("2. View Players");
-    Console.WriteLine("3. Update Player Stats");
-    Console.WriteLine("4. Search Player by ID or Username");
-    Console.WriteLine("5. Generate Report");
-    Console.WriteLine("6. Leave Application");
-    Console.Write("Select an option (1-6): ");
-    Console.ResetColor();
+    
+    string choice = ShowMenu();
 
-    string choice = Console.ReadLine(); // number gets stored into the choice variable
-
-    switch (choice) // using the switch statment for the menu, avoiding the complexity of multiple if-else statements
+    switch (choice) // using the switch statement for the menu, avoiding the complexity of multiple if-else statements
     {
+        // =========================================
+        // OPTION 1: ADD NEW PLAYER
+        // =========================================
         case "1":
             Console.Clear(); // clearing the console for better readability
             Console.WriteLine("─── ⋅ Add a new player! ⋅ ───");
             Console.Write("Enter player Username: ");
             string username = Console.ReadLine(); // reading the username input from the user
 
+
             Console.WriteLine("Games to add to your library:");
-            for (int i = 0; i < GameStats.AvailableGames.Count; i++)
+            for (int i = 0; i < GameStats.AvailableGames.Count; i++) 
             {
-                Console.WriteLine($"{i + 1}. {GameStats.AvailableGames[i]}");
+                Console.WriteLine($"{i + 1}. {GameStats.AvailableGames[i]}"); // loops through all game stores in GameStats and displays them with an index for user selection
             }
 
             Console.Write("Select a game (1-" + GameStats.AvailableGames.Count + "):");
             string gameChoiceInput = Console.ReadLine();
 
-            if (!int.TryParse(gameChoiceInput, out int gameChoice) || gameChoice < 1 || gameChoice > GameStats.AvailableGames.Count)
+            if (!int.TryParse(gameChoiceInput, out int gameChoice) || gameChoice < 1 || gameChoice > GameStats.AvailableGames.Count) // TryParse to validate game selection input
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Invalid game selection. Player not added, please try again.");
                 Console.ResetColor();
                 break;
             }
-            string selectedGame = GameStats.AvailableGames[gameChoice - 1];
+            string selectedGame = GameStats.AvailableGames[gameChoice - 1]; // Games stored with 0-based indexing, users choose games using 1-based indexing, so subtracting 1 matches them correctly
 
             Console.Write("Enter hours played: ");
             string hoursInput = Console.ReadLine();
@@ -102,6 +117,9 @@ while (running)
             logger.Log($"New player added: {username} (ID: {nextPlayerID - 1}).");
             break;
 
+        // =========================================
+        // OPTION 2: VIEW PLAYERS
+        // =========================================
 
         case "2":
             Console.Clear();
@@ -143,7 +161,11 @@ while (running)
                 }
             }
             break;
-  case "3":
+
+            // =========================================
+            // OPTION 3: UPDATE PLAYER STATS
+            // =========================================
+            case "3":
 {
     Console.Clear();
     Console.WriteLine("─── ⋅ Update Player Stats ⋅ ───");
@@ -219,7 +241,7 @@ while (running)
 
        
         var existingGame = playerToUpdate.GameStatistics
-            .FirstOrDefault(gs => gs.GameName.Equals(newGameName, StringComparison.OrdinalIgnoreCase));
+            .FirstOrDefault(gs => gs.GameName.Equals(newGameName, StringComparison.OrdinalIgnoreCase)); // retrieving existing game stats for the selected game, if match found returns that GameStats object else returns null. the lambda expression checks for case sensitivity. gs stands for a single gamestats entry from the list.
 
         if (existingGame != null)
         {
@@ -303,7 +325,7 @@ while (running)
 
     selectedGameStats.HoursPlayed += additionalHours;
 
-    if (newHighScore > selectedGameStats.HighScore)
+    if (newHighScore > selectedGameStats.HighScore) // validation for new high score being greater than existing high score
     {
         selectedGameStats.HighScore = newHighScore;
     }
@@ -321,6 +343,10 @@ while (running)
     logger.Log($"Stats updated for player ID {playerToUpdate.Id}, game: {selectedGameStats.GameName}.");
     break;
 }
+
+        // =========================================
+        // OPTION 4: SEARCH PLAYER BY ID OR USERNAME
+        // =========================================
         case "4":
             Console.WriteLine("─── ⋅ Search for a Player by ID or Username ⋅ ───");
 
@@ -355,6 +381,10 @@ while (running)
             }
 
             break;
+
+            // =========================================
+            // OPTION 5: GENERATE REPORT
+            // =========================================
         case "5":
             Console.Clear();
             Console.WriteLine("─── ⋅ Generate Player Report ⋅ ───");
@@ -373,6 +403,10 @@ while (running)
             }
 
             break;
+
+            // =========================================
+            // OPTION 6: EXIT APPLICATION
+            // =========================================
         case "6":
             // Exit the application
             fileController.SavePlayers(playerManager.GetAllPlayers()); // saving all players to the file before exiting, using file controller to handle file operations
@@ -384,4 +418,22 @@ while (running)
             break;
     }
     Console.WriteLine(); 
+    
+    static string ShowMenu()
+    {
+            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.WriteLine("─── ⋅ Player Statistics Manager ⋅ ───");
+            Console.WriteLine("1. Add New Player");
+            Console.WriteLine("2. View Players");
+            Console.WriteLine("3. Update Player Stats");
+            Console.WriteLine("4. Search Player by ID or Username");
+            Console.WriteLine("5. Generate Report");
+            Console.WriteLine("6. Leave Application");
+            Console.Write("Select an option (1-6): ");
+            Console.ResetColor();
+
+            return Console.ReadLine() ?? string.Empty;
+    }
+
+
 }

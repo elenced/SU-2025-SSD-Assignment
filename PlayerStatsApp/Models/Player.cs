@@ -5,7 +5,7 @@ namespace PlayerStatsApp.Models; // creating a namespace to practice oop for bet
 
 public class Player
 {
-    public int Id { get; set; }
+    public int Id { get; set; } 
     public string Username { get; set; } = string.Empty; // using string.empty to avoid null reference issues
     public double HoursPlayed { get; set; }
     public int HighScore { get; set; }

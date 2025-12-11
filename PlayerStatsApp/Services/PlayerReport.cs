@@ -7,6 +7,12 @@ using PlayerStatsApp.Models;
 
 namespace PlayerStatsApp.Services
 {
+
+    /// <summary>
+    /// Generates a summary report for players including average hours played, highest scorers, most active players
+    /// and sorted rankings.
+    /// Writes reports to a text file and logs key actions
+    /// </summary>
     public class PlayerReport : IReportGenerator
     {
         private ActivityLog logger;
@@ -15,6 +21,12 @@ namespace PlayerStatsApp.Services
         {
             logger = ActivityLog.GetInstance();
         }
+
+        /// <summary>
+        /// Generates a fromatted statistics report for all players
+        /// Calculates averages, top performers and saves the report to a text file.
+        /// </summary>
+        /// <param name="players"></param>
 
         public void GeneratePlayerReport(List<Player> players)
         {
@@ -34,7 +46,7 @@ namespace PlayerStatsApp.Services
             {
                 totalHours += p.HoursPlayed;
                 totalHighScore += p.HighScore;
-
+                // Identify top scorer and most active player by iterating stats
                 if (topScorer == null || p.HighScore > topScorer.HighScore)
                 {
                     topScorer = p;
@@ -45,11 +57,14 @@ namespace PlayerStatsApp.Services
                     mostActive = p;
                 }
             }
+            // Caalculating overall averages for hours and high scores
             double averageHours = totalHours / players.Count;
             double averageHighScore = (double)totalHighScore / players.Count;
 
+
+            // Sorts players by hours polayed in decreasing order using LINQ
             var playersByHours = players
-                .OrderByDescending(p => p.HoursPlayed)
+                .OrderByDescending(p => p.HoursPlayed) // lambda that slects the property to sort by
                 .ToList();
 
 string summary = "─── ⋅ Player Statistics Summary ⋅ ───\n" +
@@ -71,12 +86,13 @@ string summary = "─── ⋅ Player Statistics Summary ⋅ ───\n" +
             Console.WriteLine(summary);
             try
             {
+                // Saves the report to a text file
                 File.WriteAllText(reportPath, summary);
                 logger.Log("Player report saved to "  + reportPath);
             }
             catch (Exception ex)
             {
-                logger.Log($"Error writing report, check here: {ex.Message}");
+                logger.Log($"Error writing report, check here: {ex.Message}"); // Log any errros that occur while writing the file
             }
         }
     }

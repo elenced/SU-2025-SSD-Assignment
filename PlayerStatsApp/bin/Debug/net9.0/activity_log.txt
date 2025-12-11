@@ -1,1 +1,4 @@
 2025-12-10 22:55:11 - Console app loaded.
+2025-12-11 16:36:08 - Console app loaded.
+2025-12-11 16:38:57 - Error saving players to file
+2025-12-11 16:42:50 - Console app loaded.

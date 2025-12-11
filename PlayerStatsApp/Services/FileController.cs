@@ -52,7 +52,7 @@ namespace PlayerStatsApp.Services
                 string jsonString = JsonSerializer.Serialize(players, options); // Converts Player list into JSON text
                 File.WriteAllText(_filePath, jsonString); // writing the JSON text to the specified file, used for data persistence
         }
-        catch (IOException)
+        catch (IOException ex)
      {
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine($"Error saving players to file: {ex.Message}");
