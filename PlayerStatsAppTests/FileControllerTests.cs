@@ -43,8 +43,8 @@ public sealed class FileControllerTests
         // Arrange
         var originalPlayers = new List<Player>
         {
-            new Player(1, "Alice", 10.0, 100),
-            new Player(2, "Bob",   20.0, 200)
+            new Player(1, "Zara", 10.0, 100),
+            new Player(2, "James",   20.0, 200)
         };
 
         var fileController = new FileController(testFilePath);
@@ -55,7 +55,7 @@ public sealed class FileControllerTests
 
         // Assert
         Assert.AreEqual(originalPlayers.Count, loadedPlayers.Count);
-        Assert.AreEqual("Alice", loadedPlayers[0].Username);
-        Assert.AreEqual("Bob",   loadedPlayers[1].Username);
+        Assert.AreEqual("Zara", loadedPlayers[0].Username);
+        Assert.AreEqual("James",   loadedPlayers[1].Username);
     }
 }
